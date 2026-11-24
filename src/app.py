@@ -14,6 +14,13 @@ if "theme" not in st.session_state:
     st.session_state.theme = "Light"
 
 with st.sidebar:
+    try:
+        st.image('assets/logo.png', width=140)
+    except:
+        try:
+            st.image('../assets/logo.png', width=140)
+        except:
+            pass
     st.markdown("### 🎨 Appearance")
     theme_choice = st.radio("Color mode", ["Light", "Dark"], index=0 if st.session_state.theme == "Light" else 1, horizontal=True)
     st.session_state.theme = theme_choice

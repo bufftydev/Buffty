@@ -1,0 +1,7 @@
+streamlit
+supabase
+python-dotenv
+finnhub-python
+groq
+requests
+beautifulsoup4

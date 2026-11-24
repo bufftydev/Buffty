@@ -19,7 +19,7 @@ with st.sidebar:
     st.session_state.theme = theme_choice
     st.markdown("---")
     st.markdown("### 🧭 Pick a company")
-    symbol = st.selectbox("Stock", ["AAPL", " MSFT", "NVDA", " AMZN", "GOOGL"], label_visibility="collapsed")
+    symbol = st.selectbox("Stock", ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL"], label_visibility="collapsed")
     st.markdown("---")
     st.markdown("**Buffty Universe**")
     st.markdown("5 US companies • Daily update • 9am")

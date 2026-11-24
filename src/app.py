@@ -102,8 +102,8 @@ if st.session_state.selected:
         else:
             st.info("No price data yet. Run ingest_prices.py")
     with tab2:
-        if ana_res and ana_res.data and ana_res.data[0].get("analysis"):
-            st.write(ana_res.data[0].get("analysis"))
+        if ana_res and ana_res.data and ana_res.data[0].get("summary") or ana_res.data[0].get("analysis") or ana_res.data[0].get("content"):
+            st.write(ana_res.data[0].get("summary") or ana_res.data[0].get("analysis") or ana_res.data[0].get("content"))
         else:
             st.info("No Buffett analysis yet. Run: cd ~/buffty && python3 src/analyze_all.py")
     with tab3:

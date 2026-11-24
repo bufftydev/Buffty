@@ -1,9 +1,10 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
+import re
 
 def show_politicians(symbol):
-    st.subheader(f"🏛 Politician Trades — {symbol} (Delayed 30-45 days)")
+    st.subheader(f"🏛 Politician Trades — {symbol}")
     st.caption("Source: Official House + Senate disclosures via Capitol Trades public pages")
     headers = {"User-Agent": "Mozilla/5.0 Buffty"}
     url = f"https://www.capitoltrades.com/trades?tickers={symbol}"
@@ -18,18 +19,24 @@ def show_politicians(symbol):
             cols = [c.get_text(strip=True) for c in row.find_all("td")]
             if not cols:
                 continue
-            # Capitol Trades columns: Politician | Issuer | Published | Traded | Filed After | Owner | Type | Size | Price
-            name = cols[0] if len(cols) > 0 else "Unknown"
-            issuer = cols[1] if len(cols) > 1 else symbol
-            published = cols[2] if len(cols) > 2 else ""
-            traded = cols[3] if len(cols) > 3 else published
+            raw_name = cols[0] if len(cols) > 0 else "Unknown"
+            # Parse Name + Party from "Name (D-CA)" / "Name (R-TX)"
+            m = re.search(r"\((D|R|I)[^)]*\)", raw_name)
+            party = {"D": "Democrat", "R": "Republican", "I": "Independent"}.get(m.group(1) if m else "", "Unknown")
+            name = re.sub(r"\s*\(.*?\)", "", raw_name).strip()
+            # Position: Capitol Trades page distinguishes House/Senate in detail page; row itself doesn't carry it,
+            # so we label as Congress/Senate from the trade source, default Congress
+            position = "Congress"
+            # Heuristic: if detail link mentions senate, use Senate - checked via row link
+            link = row.find("a")
+            if link and "senate" in str(link.get("href", "")).lower():
+                position = "Senate"
+            traded = cols[3] if len(cols) > 3 else (cols[2] if len(cols) > 2 else "")
             trade_type = cols[6] if len(cols) > 6 else ""
             size = cols[7] if len(cols) > 7 else ""
-            # Position: Capitol Trades lists House/Senate in politician page, default to Congress if unknown
-            # We keep subtitle as Position | Party pattern - party is in name on site, so show name detail as subtitle
             with st.container(border=True):
                 st.markdown(f"**{name}**")
-                st.caption(f"Congress | {issuer}")
+                st.caption(f"{position} | {party}")
                 st.markdown(f"**{symbol}** | {trade_type} | {size} | {traded}")
     except Exception as e:
         st.info(f"Could not load politician data: {e}")
